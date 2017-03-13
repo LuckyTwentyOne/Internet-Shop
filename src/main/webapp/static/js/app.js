@@ -66,10 +66,14 @@
 	var loadMoreProducts = function() {
 		$('#loadMore').addClass('hidden');
 		$('#loadMoreIndicator').removeClass('hidden');
-		setTimeout(function(){
- 			$('#loadMoreIndicator').addClass('hidden');
- 			$('#loadMore').removeClass('hidden');
-		},800);
+		$.ajax ({
+			url: '/iShop/ajax/html/more/products',
+			success : function(html) {
+				$('#productList .text-center').prepend(html);
+				$('#loadMoreIndicator').addClass('hidden');
+	 			$('#loadMore').removeClass('hidden');
+			}
+		});
 	};
 
 	var initSearchForm = function() {

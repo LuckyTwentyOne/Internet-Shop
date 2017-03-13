@@ -1,8 +1,9 @@
+<%@ page contentType="text/html; UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <div class="visible-xs-block xs-option-container">
   <a class="pull-right" data-toggle="collapse" href="#productCatalog">Product catalog <span class="caret"></span></a>
   <a data-toggle="collapse" href="#findProducts">Find products <span class="caret"></span></a>
 </div>
-<form action="products.html">
+<form action="search">
 	<div id="findProducts" class="panel panel-success collapse">
        <div class="panel-heading">Find products</div>       
        <div class="panel-body">
@@ -51,12 +52,12 @@
 <div id="productCatalog" class="panel panel-success collapse">
   <div class="panel-heading">Product catalog</div>
   <div class="list-group">
-     <a href="#" class="list-group-item"> <span class="badge">78</span> E-book</a>
-     <a href="#" class="list-group-item"> <span class="badge">75</span> Mp3-player</a>
-     <a href="#" class="list-group-item"> <span class="badge">110</span> Notebook</a>
-     <a href="#" class="list-group-item"> <span class="badge">113</span> Phone</a>
-     <a href="#" class="list-group-item"> <span class="badge">216</span> Smartphone</a>
-     <a href="#" class="list-group-item"> <span class="badge">95</span> Smartwatch</a>
-     <a href="#" class="list-group-item"> <span class="badge">211</span> Tablet</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">78</span> E-book</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">75</span> Mp3-player</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">110</span> Notebook</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">113</span> Phone</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">216</span> Smartphone</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">95</span> Smartwatch</a>
+     <a href="/iShop/products" class="list-group-item"> <span class="badge">211</span> Tablet</a>
   </div>
 </div>          

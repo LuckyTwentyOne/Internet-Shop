@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ua.kh.butov.ishop.service.ServiceManager;
+import ua.kh.butov.ishop.service.OrderService;
+import ua.kh.butov.ishop.service.ProductService;
+import ua.kh.butov.ishop.service.impl.ServiceManager;
 
 public abstract class AbstractController extends HttpServlet {
 	private static final long serialVersionUID = 8233947516885878614L;
@@ -27,6 +29,14 @@ public abstract class AbstractController extends HttpServlet {
 	@Override
 	public final void init(ServletConfig config) throws ServletException {
 		super.init(config);
+	}
+	
+	public final ProductService getProductService(){
+		return serviceManager.getProductService();
+	}
+	
+	public final OrderService getOrderService(){
+		return serviceManager.getOrderService();
 	}
 
 }

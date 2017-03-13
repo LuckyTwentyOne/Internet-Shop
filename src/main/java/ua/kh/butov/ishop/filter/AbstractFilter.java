@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ua.kh.butov.ishop.util.UrlUtils;
+
 
 /**
  * Basic class for all application filters.
@@ -32,7 +34,12 @@ public abstract class AbstractFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
-		doFilter(req, resp, chain);
+		String url = req.getRequestURI();
+		if(UrlUtils.isMediaUrl(url)||UrlUtils.isStaticUrl(url)){
+			chain.doFilter(request, response);
+		}else{
+			doFilter(req, resp, chain);
+		}	
 	}
 
 	/**

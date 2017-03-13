@@ -2,12 +2,8 @@ package ua.kh.butov.ishop.filter;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -16,22 +12,14 @@ import javax.servlet.http.HttpServletResponse;
 import ua.kh.butov.ishop.model.ShoppingCart;
 import ua.kh.butov.ishop.util.SessionUtils;
 
-@WebFilter("/*")
-public class AutoRestoreShoppingCartFilter implements Filter {
+@WebFilter(filterName="AutoRestoreShoppingCartFilter")
+public class AutoRestoreShoppingCartFilter extends AbstractFilter {
 
 	private static final String SHOPPING_CARD_DESERIALIZATION_DONE = "SHOPPING_CARD_DESERIALIZATION_DONE";
-
+	
 	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+	public void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse resp = (HttpServletResponse) response;
 		if (req.getSession().getAttribute(SHOPPING_CARD_DESERIALIZATION_DONE) == null) {
 			if (!SessionUtils.isCurrentShoppingCartCreated(req)) {
 				Cookie cookie = SessionUtils.findShoppingCartCookie(req);
@@ -61,11 +49,4 @@ public class AutoRestoreShoppingCartFilter implements Filter {
 		}
 		return shoppingCart;
 	}
-
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-		// TODO Auto-generated method stub
-
-	}
-
 }

@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -8,7 +9,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="products.html">IShop</a>
+			<a class="navbar-brand" href="/iShop/products">IShop</a>
 		</div>
 		<div class="collapse navbar-collapse" id="ishopNav">
 			<ul id="currentShoppingCart" class="nav navbar-nav navbar-right hidden">
@@ -19,7 +20,7 @@
 				  <div class="dropdown-menu shopping-cart-desc">
 					    Total count: <span class="total-count">0</span><br>
 					    Total cost: <span class="total-cost">0</span><br>
-					    <a href="shopping-cart.html" class="btn btn-primary btn-block">View cart</a>
+					    <a href="/iShop/shopping-cart" class="btn btn-primary btn-block">View cart</a>
 				  </div>
 				</li>
 			</ul>
