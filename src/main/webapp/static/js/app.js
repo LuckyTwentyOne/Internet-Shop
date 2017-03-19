@@ -33,18 +33,27 @@
 	var addProductToCart = function (){
 		var idProduct = $('#addProductPopup').attr('data-id-product');
 		var count = $('#addProductPopup .count').val();
-		$('#addToCart').addClass('hidden');
-		$('#addToCartIndicator').removeClass('hidden');
-		setTimeout(function(){
-			var data = {
-				totalCount : count,
-				totalCost : 2000
-			};
-			$('#currentShoppingCart .total-count').text(data.totalCount);
-			$('#currentShoppingCart .total-cost').text(data.totalCost);
-			$('#currentShoppingCart').removeClass('hidden');
-			$('#addProductPopup').modal('hide');
-		}, 800);
+		var btn = $('#addToCart');
+		convertButtonToLoader(btn, 'btn-primary');
+		$.ajax({
+			url : '/iShop/ajax/json/product/add',
+			method : 'POST',
+			data : {
+				idProduct : idProduct,
+				count : count
+			},
+			success : function(data) {
+				$('#currentShoppingCart .total-count').text(data.totalCount);
+	 			$('#currentShoppingCart .total-cost').text(data.totalCost);
+				$('#currentShoppingCart').removeClass('hidden');
+				$('#addProductPopup').modal('hide');
+				convertLoaderToButton(btn, 'btn-primary', addProductToCart);
+			},
+			error : function(data) {
+				convertLoaderToButton(btn, 'btn-primary', addProductToCart);
+				alert('Error');
+			}
+		});
 	};
 	var calculateCost = function(){
 		var priceStr = $('#addProductPopup .price').text();
@@ -82,14 +91,23 @@
 	var loadMoreProducts = function (){
 		var btn = $('#loadMore');
 		convertButtonToLoader(btn, 'btn-success');
+		var pageNumber = parseInt($('#productList').attr('data-page-number'));
 		var path=location.pathname.substring('/iShop'.length);
-		var searchQuery = location.search.substring(1).substring('/iShop'.length);
-		var url = '/iShop/ajax/html/more' + path + '?' + searchQuery;
+		var searchQuery = location.search.substring(1);
+		var url = '/iShop/ajax/html/more' + path + '?page=' + (pageNumber+1)+ '&' + searchQuery;
 		$.ajax({
 			url : url,
 			success : function(html) {
-				$('#productList .text-center').prepend(html);
-				convertLoaderToButton(btn, 'btn-success', loadMoreProducts);
+				$('#productList .row').append(html);
+				pageNumber++;
+				var pageCount = parseInt($('#productList').attr('data-page-count'));
+				$('#productList').attr('data-page-number', pageNumber);
+				if(pageNumber < pageCount) {
+					convertLoaderToButton(btn, 'btn-success', loadMoreProducts);
+				} else {
+					btn.remove();
+				}
+				
 			},
 			error : function(data) {
 				convertLoaderToButton(btn, 'btn-success', loadMoreProducts);

@@ -3,7 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<div class="row">
 	<c:forEach var="p" items="${products }">
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xlg-2">
 			<!-- PRODUCT DATA -->
@@ -24,12 +23,11 @@
 					<div class="price">$ ${p.price }</div>
 					<a class="btn btn-primary pull-right buy-btn" data-id-product="${p.id }">Buy</a>
 					<div class="list-group">
-						<span class="list-group-item"><small>Category:</small><span class="category">${p.category }</span></span> 
-						<span class="list-group-item"><small>Producer:</small><span class="producer">${p.producer }</span></span>
+						<span class="list-group-item"><small>Category: </small><span class="category">${p.category }</span></span> 
+						<span class="list-group-item"><small>Producer: </small><span class="producer">${p.producer }</span></span>
 					</div>
 				</div>
 			</div>
 			<!-- /PRODUCT DATA -->
 		</div>
 	</c:forEach>
-</div>

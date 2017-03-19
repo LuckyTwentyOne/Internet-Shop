@@ -12,14 +12,14 @@
 			<a class="navbar-brand" href="/iShop/products">IShop</a>
 		</div>
 		<div class="collapse navbar-collapse" id="ishopNav">
-			<ul id="currentShoppingCart" class="nav navbar-nav navbar-right hidden">
+			<ul id="currentShoppingCart" class="nav navbar-nav navbar-right ${CURRENT_SHOPPING_CART==null ? 'hidden' : ''}">
 				<li class="dropdown">
 				  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-					<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shopping cart (<span class="total-count">0</span>)
+					<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shopping cart (<span class="total-count">${CURRENT_SHOPPING_CART.totalCount}</span>)
 					       <span class="caret"></span></a>
 				  <div class="dropdown-menu shopping-cart-desc">
-					    Total count: <span class="total-count">0</span><br>
-					    Total cost: <span class="total-cost">0</span><br>
+					    Total count: <span class="total-count">${CURRENT_SHOPPING_CART.totalCount}</span><br>
+					    Total cost: <span class="total-cost">${CURRENT_SHOPPING_CART.totalCost}</span><br>
 					    <a href="/iShop/shopping-cart" class="btn btn-primary btn-block">View cart</a>
 				  </div>
 				</li>

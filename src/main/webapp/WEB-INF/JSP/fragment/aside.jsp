@@ -1,14 +1,16 @@
 <%@ page contentType="text/html; UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="ishop" tagdir="/WEB-INF/tags"%>
 <div class="visible-xs-block xs-option-container">
   <a class="pull-right" data-toggle="collapse" href="#productCatalog">Product catalog <span class="caret"></span></a>
   <a data-toggle="collapse" href="#findProducts">Find products <span class="caret"></span></a>
 </div>
-<form action="search">
+<form class="search" action="search">
 	<div id="findProducts" class="panel panel-success collapse">
        <div class="panel-heading">Find products</div>       
        <div class="panel-body">
          <div class="input-group">
-           <input type="text" name="query" class="form-control" placeholder="Search query">
+           <input type="text" name="query" class="form-control" placeholder="Search query" value="${searchForm.query }">
            <span class="input-group-btn">
               <a id="goSearch" class="btn btn-default">Go!</a>
            </span>
@@ -17,47 +19,19 @@
               <a data-toggle="collapse" href="#searchOptions">More filters <span class="caret"></span></a>
          </div>       
         </div>      
-              <div id="searchOptions" class="collapse">
-                <div class="panel-heading">Category filters</div>
-                <div class="panel-body categories">
-                  <label> <input type="checkbox" id="allCategories"> All </label>
-                  <div class="form-group">
-                    <div class="checkbox">
-                      <label><input type="checkbox" name="category" value="1" class="search-option">E-book (78)</label>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="checkbox">
-                      <label><input type="checkbox" name="category" value="2" class="search-option">Mp3-player (75)</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="panel-heading">Producers filters</div>
-                <div class="panel-body producers">
-                  <label> <input type="checkbox" id="allProducers"> All </label>
-                  <div class="form-group">
-                    <div class="checkbox">
-                      <label><input type="checkbox" name="producer" value="1" class="search-option">Dell (56) </label>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="checkbox">
-                      <label><input type="checkbox" name="producer" value="2" class="search-option">Apple (22) </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
+	        <div id="searchOptions" class="collapse ${searchForm!=null and (!searchForm.categoriesEmpty or !searchForm.producersEmpty) ? 'in' : ''}">
+				<ishop:category-filter categories="${CATEGORY_LIST }" searchForm="${searchForm }"/>
+				<ishop:producer-filter producers="${PRODUCER_LIST }" searchForm="${searchForm }"/>
+			</div>
 	</div>
 </form>
 <div id="productCatalog" class="panel panel-success collapse">
   <div class="panel-heading">Product catalog</div>
   <div class="list-group">
-     <a href="/iShop/products/e-book" class="list-group-item"> <span class="badge">78</span> E-book</a>
-     <a href="/iShop/products/mp3" class="list-group-item"> <span class="badge">75</span> Mp3-player</a>
-     <a href="/iShop/products/notepad" class="list-group-item"> <span class="badge">110</span> Notebook</a>
-     <a href="/iShop/products/phone" class="list-group-item"> <span class="badge">113</span> Phone</a>
-     <a href="/iShop/products/smartphone" class="list-group-item"> <span class="badge">216</span> Smartphone</a>
-     <a href="/iShop/products/smartwatch" class="list-group-item"> <span class="badge">95</span> Smartwatch</a>
-     <a href="/iShop/products/tablet" class="list-group-item"> <span class="badge">211</span> Tablet</a>
+  	<c:forEach var="category" items="${CATEGORY_LIST }">
+     	<a href="/iShop/products${category.url }" class="list-group-item ${selectedCategoryUrl == category.url ? 'active' : ''}">
+     	 	<span class="badge">${category.productCount }</span> ${category.name }
+     	</a>
+    </c:forEach>
   </div>
 </div>          

@@ -3,19 +3,29 @@ package ua.kh.butov.ishop.filter;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ua.kh.butov.ishop.form.ProductForm;
 import ua.kh.butov.ishop.model.ShoppingCart;
+import ua.kh.butov.ishop.service.OrderService;
+import ua.kh.butov.ishop.service.impl.ServiceManager;
 import ua.kh.butov.ishop.util.SessionUtils;
 
 @WebFilter(filterName="AutoRestoreShoppingCartFilter")
 public class AutoRestoreShoppingCartFilter extends AbstractFilter {
 
 	private static final String SHOPPING_CARD_DESERIALIZATION_DONE = "SHOPPING_CARD_DESERIALIZATION_DONE";
+	private OrderService orderService;
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		orderService = ServiceManager.getInstance(filterConfig.getServletContext()).getOrderService();
+	}
 	
 	@Override
 	public void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
@@ -42,7 +52,7 @@ public class AutoRestoreShoppingCartFilter extends AbstractFilter {
 			try {
 				int idProduct = Integer.parseInt(data[0]);
 				int count = Integer.parseInt(data[1]);
-				shoppingCart.addProduct(idProduct, count);
+				orderService.addProductToShoppingCart(new ProductForm(idProduct, count), shoppingCart);
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}

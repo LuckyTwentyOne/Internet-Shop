@@ -47,6 +47,11 @@
 			<artifactId>commons-dbcp2</artifactId>
 			<version>2.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160810</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>iShop</finalName>
@@ -89,7 +94,8 @@
 							<tasks>
 								<delete dir="${basedir}/src/main/webapp/WEB-INF/lib" />
 								<copy todir="${basedir}/src/main/webapp/WEB-INF/lib">
-									<fileset dir="${basedir}/target/${project.build.finalName}/WEB-INF/lib" />
+									<fileset
+										dir="${basedir}/target/${project.build.finalName}/WEB-INF/lib" />
 								</copy>
 							</tasks>
 						</configuration>

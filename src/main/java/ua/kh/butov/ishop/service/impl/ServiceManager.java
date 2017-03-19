@@ -26,7 +26,7 @@ public class ServiceManager {
 		loadApplicationProperties();
 		dataSource = createDataSource();
 		productService = new ProductServiceImpl(dataSource);
-		orderService = new OrderServiceImpl();
+		orderService = new OrderServiceImpl(dataSource);
 	}
 
 	public static ServiceManager getInstance(ServletContext context) {
