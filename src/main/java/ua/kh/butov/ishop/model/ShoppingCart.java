@@ -2,7 +2,9 @@ package ua.kh.butov.ishop.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import ua.kh.butov.ishop.constant.Constants;
 import ua.kh.butov.ishop.entity.Product;
@@ -10,7 +12,7 @@ import ua.kh.butov.ishop.exception.ValidationException;
 
 public class ShoppingCart implements Serializable {
 	private static final long serialVersionUID = 1535770438453611801L;
-	private Map<Integer, ShoppingCartItem> products = new HashMap<>();
+	private Map<Integer, ShoppingCartItem> products = new LinkedHashMap<>();
 	private int totalCount = 0;
 	private BigDecimal totalCost = BigDecimal.ZERO;
 
