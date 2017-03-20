@@ -198,7 +198,7 @@
 				}
 			},
 			error : function(data) {
-				convertLoaderToButton(btn, 'btn-primary', addProductToCart);
+				convertLoaderToButton(btn, 'btn-danger', removeProductFromCart);
 				alert('Error');
 			}
 		});
