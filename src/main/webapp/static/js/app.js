@@ -171,45 +171,37 @@
 	var executeRemoveProduct = function (btn) {
 		var idProduct = btn.attr('data-id-product');
 		var count = btn.attr('data-count');
-		btn.removeClass('btn-danger');
-		btn.removeClass('btn');
-		btn.addClass('load-indicator');
-		var text = btn.text();
-		btn.text('');
-		btn.off('click');
-
-		setTimeout(function(){
-			var data = {
-				totalCount : 1,
-				totalCost : 1
-			};
-			if(data.totalCount === 0) {
-				window.location.href = 'products.html';
-			} else {
-				var prevCount = parseInt($('#product'+idProduct+' .count').text());
-				var remCount = parseInt(count);
-				if(remCount === prevCount) {
-					$('#product'+idProduct).remove();
-
-					//
-					if($('#shoppingCart .item').length === 0) {
-						window.location.href = 'products.html';
+		convertButtonToLoader(btn, 'btn-danger');
+		$.ajax({
+			url : '/iShop/ajax/json/product/remove',
+			method : 'POST',
+			data : {
+				idProduct : idProduct,
+				count : count
+			},
+			success : function(data) {
+				if(data.totalCount === 0) {
+					window.location.href = '/iShop/products';
+				}else {
+					var prevCount = parseInt($('#product' + idProduct + ' .count').text());
+					var remCount = parseInt(count);
+					if (remCount >= prevCount) {
+						$('#product' + idProduct).remove();
+					} else {
+						convertLoaderToButton(btn, 'btn-danger', removeProductFromCart);
+						$('#product' + idProduct + ' .count').text(prevCount - remCount);
+						if(prevCount - remCount == 1) {
+							$('#product' + idProduct + ' a.remove-all').remove();
+						}
 					}
-					//
-				} else {
-					btn.removeClass('load-indicator');
-					btn.addClass('btn-danger');
-					btn.addClass('btn');
-					btn.text(text);
-					btn.click(removeProductFromCart);
-					$('#product'+idProduct+' .count').text(prevCount - remCount);
-					if(prevCount - remCount == 1) {
-						$('#product'+idProduct+' a.remove-product.all').remove();
-					}
+					refreshTotalCost();
 				}
-				refreshTotalCost();
+			},
+			error : function(data) {
+				convertLoaderToButton(btn, 'btn-primary', addProductToCart);
+				alert('Error');
 			}
-		}, 1000);
+		});
 	}
 
 	init();
