@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.ProductService;
+import ua.kh.butov.ishop.service.SocialService;
 
 public class ServiceManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceManager.class);
@@ -20,6 +21,7 @@ public class ServiceManager {
 	private final BasicDataSource dataSource;
 	private final ProductService productService;
 	private final OrderService orderService;
+	private final SocialService socialService;
 	private final Properties applicationProperties = new Properties();
 
 	private ServiceManager(ServletContext context) {
@@ -27,6 +29,7 @@ public class ServiceManager {
 		dataSource = createDataSource();
 		productService = new ProductServiceImpl(dataSource);
 		orderService = new OrderServiceImpl(dataSource);
+		socialService = new FacebookSocialService(this);
 	}
 
 	public static ServiceManager getInstance(ServletContext context) {
@@ -44,6 +47,10 @@ public class ServiceManager {
 
 	public OrderService getOrderService() {
 		return orderService;
+	}
+	
+	public SocialService getSocialService() {
+		return socialService;
 	}
 
 	public String getApplicationProperty(String key) {

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ua.kh.butov.ishop.entity.Account;
 import ua.kh.butov.ishop.entity.Category;
 import ua.kh.butov.ishop.entity.Producer;
 import ua.kh.butov.ishop.entity.Product;
@@ -46,6 +47,17 @@ public final class ResultSetHandlerFactory {
 			p.setName(rs.getString("name"));
 			p.setProductCount(rs.getInt("product_count"));
 			return p;
+		}
+	};
+	
+	public final static ResultSetHandler<Account> ACCOUNT_RESULT_SET_HANDLER = new ResultSetHandler<Account>() {
+		@Override
+		public Account handle(ResultSet rs) throws SQLException {
+			Account a = new Account();
+			a.setId(rs.getInt("id"));
+			a.setEmail(rs.getString("email"));
+			a.setName(rs.getString("name"));
+			return a;
 		}
 	};
 	

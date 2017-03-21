@@ -8,11 +8,14 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ua.kh.butov.ishop.entity.Account;
 import ua.kh.butov.ishop.entity.Product;
 import ua.kh.butov.ishop.exception.SqlApplicationException;
 import ua.kh.butov.ishop.form.ProductForm;
+import ua.kh.butov.ishop.model.CurrentAccount;
 import ua.kh.butov.ishop.model.ShoppingCart;
 import ua.kh.butov.ishop.model.ShoppingCartItem;
+import ua.kh.butov.ishop.model.SocialAccount;
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.jdbc.JDBCUtils;
 import ua.kh.butov.ishop.service.jdbc.ResultSetHandler;
@@ -22,6 +25,8 @@ class OrderServiceImpl implements OrderService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 	private static final ResultSetHandler<Product> productResultSetHandler = ResultSetHandlerFactory
 			.getSingleResultSetHandler(ResultSetHandlerFactory.PRODUCT_RESULT_SET_HANDLER);
+	private static final ResultSetHandler<Account> accountResultSetHandler = 
+			ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.ACCOUNT_RESULT_SET_HANDLER);
 	private final DataSource dataSource;
 
 	public OrderServiceImpl(DataSource dataSource) {
@@ -43,12 +48,12 @@ class OrderServiceImpl implements OrderService {
 			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void removeProductFromShoppingCart(ProductForm form, ShoppingCart shoppingCart) {
 		shoppingCart.removeProduct(form.getIdProduct(), form.getCount());
 	}
-	
+
 	@Override
 	public String serializeShoppingCart(ShoppingCart shoppingCart) {
 		StringBuilder res = new StringBuilder();
@@ -76,5 +81,22 @@ class OrderServiceImpl implements OrderService {
 			}
 		}
 		return shoppingCart.getItems().isEmpty() ? null : shoppingCart;
+	}
+
+	@Override
+	public CurrentAccount authentificate(SocialAccount socialAccount) {
+		try (Connection c = dataSource.getConnection()) {
+			Account account = JDBCUtils.select(c, "select * from account where email=?", accountResultSetHandler,
+					socialAccount.getEmail());
+			if (account == null) {
+				account = new Account(socialAccount.getName(), socialAccount.getEmail());
+				account = JDBCUtils.insert(c, "insert into account values (nextval('account_seq'),?,?)",
+						accountResultSetHandler, account.getName(), account.getEmail());
+				c.commit();
+			}
+			return account;
+		} catch (SQLException e) {
+			throw new SqlApplicationException("Can't execute SQL request: " + e.getMessage(), e);
+		}
 	}
 }

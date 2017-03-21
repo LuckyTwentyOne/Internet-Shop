@@ -12,6 +12,7 @@ import ua.kh.butov.ishop.form.ProductForm;
 import ua.kh.butov.ishop.form.SearchForm;
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.ProductService;
+import ua.kh.butov.ishop.service.SocialService;
 import ua.kh.butov.ishop.service.impl.ServiceManager;
 
 public abstract class AbstractController extends HttpServlet {
@@ -40,6 +41,10 @@ public abstract class AbstractController extends HttpServlet {
 	
 	public final OrderService getOrderService(){
 		return serviceManager.getOrderService();
+	}
+	
+	public SocialService getSocialService() {
+		return serviceManager.getSocialService();
 	}
 	
 	public final int getPageCount(int totalCount, int itemsPerPage) {
