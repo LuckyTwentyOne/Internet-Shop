@@ -4,9 +4,13 @@
 		$('#addToCart').click(addProductToCart);
 		$('#addProductPopup .count').change(calculateCost);
 		$('#loadMore').click(loadMoreProducts);
+		$('#loadMoreOrders').click(loadMoreOrders);
 		initSearchForm();
 		$('#goSearch').click(goSearch);
 		$('.remove-product').click(removeProductFromCart);
+		$('.post-request').click(function(){
+			postRequest($(this).attr('data-url'));
+		});
 	};
 
 	var showAddProductPopup = function (){
@@ -29,6 +33,11 @@
 	};
 	var initBuyBtn = function(){
 		$('.buy-btn').click(showAddProductPopup);
+	};
+	var postRequest = function(url){
+		var form = '<form id="postRequestForm" action="'+url+'" method="post"></form>';
+		$('body').append(form);
+		$('#postRequestForm').submit();
 	};
 	var addProductToCart = function (){
 		var idProduct = $('#addProductPopup').attr('data-id-product');
@@ -111,6 +120,31 @@
 			},
 			error : function(data) {
 				convertLoaderToButton(btn, 'btn-success', loadMoreProducts);
+				alert('Error');
+			}
+		});
+	};
+	var loadMoreOrders = function (){
+		var btn = $('#loadMoreOrders');
+		convertButtonToLoader(btn, 'btn-success');
+		var pageNumber = parseInt($('#orderList').attr('data-page-number'));
+		var url = '/iShop/ajax/html/more/orders?page=' + (pageNumber+1);
+		$.ajax({
+			url : url,
+			success : function(html) {
+				$('#orderList tbody').append(html);
+				pageNumber++;
+				var pageCount = parseInt($('#orderList').attr('data-page-count'));
+				$('#orderList').attr('data-page-number', pageNumber);
+				if(pageNumber < pageCount) {
+					convertLoaderToButton(btn, 'btn-success', loadMoreOrders);
+				} else {
+					btn.remove();
+				}
+				
+			},
+			error : function(data) {
+				convertLoaderToButton(btn, 'btn-success', loadMoreOrders);
 				alert('Error');
 			}
 		});
