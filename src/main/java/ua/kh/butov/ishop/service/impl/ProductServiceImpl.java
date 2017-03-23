@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import ua.kh.butov.ishop.entity.Category;
 import ua.kh.butov.ishop.entity.Producer;
 import ua.kh.butov.ishop.entity.Product;
-import ua.kh.butov.ishop.exception.SqlApplicationException;
+import ua.kh.butov.ishop.exception.InternalServerErrorException;
 import ua.kh.butov.ishop.form.SearchForm;
 import ua.kh.butov.ishop.service.ProductService;
 import ua.kh.butov.ishop.service.jdbc.JDBCUtils;
@@ -46,7 +46,7 @@ class ProductServiceImpl implements ProductService {
 							+ "where c.id=p.id_category and pr.id=p.id_producer limit ? offset ?",
 					productsResultSetHandler, limit, offset);
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
@@ -59,7 +59,7 @@ class ProductServiceImpl implements ProductService {
 							+ "where c.id=p.id_category and pr.id=p.id_producer and c.url=? limit ? offset ?",
 					productsResultSetHandler, categoryUrl, limit, offset);
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
@@ -68,7 +68,7 @@ class ProductServiceImpl implements ProductService {
 		try (Connection connection = dataSource.getConnection()) {
 			return JDBCUtils.select(connection, "select * from category order by id", categoryListResultSetHandler);
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
@@ -77,7 +77,7 @@ class ProductServiceImpl implements ProductService {
 		try (Connection connection = dataSource.getConnection()) {
 			return JDBCUtils.select(connection, "select * from producer order by name", producerListResultSetHandler);
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
@@ -86,7 +86,7 @@ class ProductServiceImpl implements ProductService {
 		try (Connection connection = dataSource.getConnection()) {
 			return JDBCUtils.select(connection, "select count(*) from product", countResultSetHandler);
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
@@ -97,7 +97,7 @@ class ProductServiceImpl implements ProductService {
 					"select count(*) from product p, category c  where p.id_category=c.id and c.url = ?",
 					countResultSetHandler, categoryUrl);
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
@@ -112,7 +112,7 @@ class ProductServiceImpl implements ProductService {
 			LOGGER.debug("search query={} with params={}", sq.getSql(), sq.getParams());
 			return JDBCUtils.select(c, sq.getSql().toString(), productsResultSetHandler, sq.getParams().toArray());
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute SQL request: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}
 	}
 
@@ -135,7 +135,7 @@ class ProductServiceImpl implements ProductService {
 			LOGGER.debug("search query={} with params={}", sq.getSql(), sq.getParams());
 			return JDBCUtils.select(c, sq.getSql().toString(), countResultSetHandler, sq.getParams().toArray());
 		} catch (SQLException e) {
-			throw new SqlApplicationException("Can't execute SQL request: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}
 	}
 
