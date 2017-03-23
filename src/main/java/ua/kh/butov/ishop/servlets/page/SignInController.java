@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ua.kh.butov.ishop.constant.Constants;
 import ua.kh.butov.ishop.servlets.AbstractController;
 import ua.kh.butov.ishop.util.RoutingUtils;
 import ua.kh.butov.ishop.util.SessionUtils;
@@ -27,8 +28,12 @@ public class SignInController extends AbstractController {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		if (SessionUtils.isCurrentAccountCreated(req)) {
-			RoutingUtils.redirect("/my-orders", req, resp);
+			RoutingUtils.redirect("/iShop/my-orders", req, resp);
 		} else {
+			String targetUrl = req.getParameter("target");
+			if (targetUrl != null) {
+				req.getSession().setAttribute(Constants.SUCCESS_REDIRECT_URL_AFTER_SIGNIN, targetUrl);
+			}
 			RoutingUtils.redirect(getSocialService().getAuthorizeUrl(), req, resp);
 		}
 	}
