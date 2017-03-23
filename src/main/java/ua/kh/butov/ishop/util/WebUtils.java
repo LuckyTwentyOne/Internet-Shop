@@ -30,4 +30,13 @@ public final class WebUtils {
 		c.setHttpOnly(true);
 		resp.addCookie(c);
 	}
+	
+	public static String getCurrentRequestUrl(HttpServletRequest req) {
+		String query = req.getQueryString();
+		if (query == null) {
+			return req.getRequestURI();
+		} else {
+			return req.getRequestURI() + "?" + query;
+		}
+	}
 }
