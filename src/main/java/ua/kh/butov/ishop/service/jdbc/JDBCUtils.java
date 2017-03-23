@@ -27,6 +27,16 @@ public final class JDBCUtils {
 			return resultSetHandler.handle(rs);
 		}
 	}
+	
+	public static void insertBatch(Connection c, String sql, List<Object[]> parametersList) throws SQLException {
+		try (PreparedStatement ps = c.prepareStatement(sql)) {
+			for (Object[] parameters : parametersList) {
+				populatePreparedStatement(ps, parameters);
+				ps.addBatch();
+			}
+			ps.executeBatch();
+		}
+	}
 
 	private static void populatePreparedStatement(PreparedStatement ps, Object... parameters) throws SQLException {
 		if (parameters != null) {
