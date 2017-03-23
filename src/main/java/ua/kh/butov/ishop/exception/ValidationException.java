@@ -1,5 +1,6 @@
 package ua.kh.butov.ishop.exception;
 
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * {@code ValidationException} is thrown when the the 
@@ -7,7 +8,7 @@ package ua.kh.butov.ishop.exception;
  * 
  * @author V.Butov
  */
-public class ValidationException extends IllegalArgumentException {
+public class ValidationException extends AbstractApplicationException {
 	private static final long serialVersionUID = -2118427909075744449L;
 
 	/**
@@ -17,6 +18,6 @@ public class ValidationException extends IllegalArgumentException {
 	 *            message of the exception
 	 */
 	public ValidationException(String message) {
-		super(message);
+		super(message, HttpServletResponse.SC_BAD_REQUEST);;
 	}
 }

@@ -58,9 +58,13 @@
 				$('#addProductPopup').modal('hide');
 				convertLoaderToButton(btn, 'btn-primary', addProductToCart);
 			},
-			error : function(data) {
+			error : function(xhr) {
 				convertLoaderToButton(btn, 'btn-primary', addProductToCart);
-				alert('Error');
+				if (xhr.status == 400) {
+					alert(xhr.responseJSON.message);
+				} else {
+					alert('Error');
+				}
 			}
 		});
 	};
@@ -116,6 +120,7 @@
 				} else {
 					btn.remove();
 				}
+				initBuyBtn();
 				
 			},
 			error : function(data) {
@@ -143,9 +148,13 @@
 				}
 				
 			},
-			error : function(data) {
-				convertLoaderToButton(btn, 'btn-success', loadMoreOrders);
-				alert('Error');
+			error : function(xhr) {
+				convertLoaderToButton(btn, 'btn-success', loadMoreMyOrders);
+				if (xhr.status == 401) {
+					window.location.href = '/iShop/sign-in';
+				} else {
+					alert('Error');
+				}
 			}
 		});
 	};

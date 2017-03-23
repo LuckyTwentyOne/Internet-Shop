@@ -1,9 +1,11 @@
 package ua.kh.butov.ishop.exception;
 
-public class ResourceNotFoundException extends IllegalArgumentException {
+import javax.servlet.http.HttpServletResponse;
+
+public class ResourceNotFoundException extends AbstractApplicationException {
 	private static final long serialVersionUID = -6121766502027524096L;
 
 	public ResourceNotFoundException(String s) {
-		super(s);
+		super(s, HttpServletResponse.SC_NOT_FOUND);
 	}
 }
