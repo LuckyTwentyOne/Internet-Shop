@@ -12,7 +12,7 @@ import com.restfb.types.User;
 import ua.kh.butov.ishop.model.SocialAccount;
 import ua.kh.butov.ishop.service.SocialService;
 
-public class FacebookSocialService implements  SocialService {
+public class FacebookSocialService implements SocialService {
 	private final String idClient;
 	private final String secret;
 	private final String redirectUrl;
@@ -37,6 +37,7 @@ public class FacebookSocialService implements  SocialService {
 		AccessToken accessToken = client.obtainUserAccessToken(idClient, secret, redirectUrl, authToken);
 		client = new DefaultFacebookClient(accessToken.getAccessToken(), Version.VERSION_2_5);
 		User user = client.fetchObject("me", User.class, Parameter.with("fields", "name,email,first_name,last_name"));
-		return new SocialAccount(user.getFirstName(), user.getEmail());
+		String avatarUrl = String.format("https://graph.facebook.com/v2.7/%s/picture?type=small", user.getId());
+		return new SocialAccount(user.getFirstName(), user.getEmail(), avatarUrl);
 	}
 }

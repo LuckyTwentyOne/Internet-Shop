@@ -28,7 +28,7 @@ public class ServiceManager {
 		loadApplicationProperties();
 		dataSource = createDataSource();
 		productService = new ProductServiceImpl(dataSource);
-		orderService = new OrderServiceImpl(dataSource);
+		orderService = new OrderServiceImpl(dataSource, this);
 		socialService = new FacebookSocialService(this);
 	}
 
@@ -48,20 +48,25 @@ public class ServiceManager {
 	public OrderService getOrderService() {
 		return orderService;
 	}
-	
+
 	public SocialService getSocialService() {
 		return socialService;
 	}
 
 	public String getApplicationProperty(String key) {
-		return applicationProperties.getProperty(key);
+		String value = applicationProperties.getProperty(key);
+		if (value.startsWith("${sysEnv.")) {
+			String keyVal = value.replace("${sysEnv.", "").replace("}", "");
+			value = System.getProperty(keyVal);
+		}
+		return value;
 	}
 
 	public void close() {
 		try {
 			dataSource.close();
 		} catch (SQLException e) {
-			LOGGER.error("Close datasource failed: "+e.getMessage(), e);
+			LOGGER.error("Close datasource failed: " + e.getMessage(), e);
 		}
 	}
 
@@ -72,8 +77,8 @@ public class ServiceManager {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private BasicDataSource createDataSource(){
+
+	private BasicDataSource createDataSource() {
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDefaultAutoCommit(false);
 		dataSource.setRollbackOnReturn(true);

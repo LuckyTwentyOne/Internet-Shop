@@ -7,6 +7,7 @@ public class Account extends AbstractEntity<Integer> implements CurrentAccount {
 
 	private String name;
 	private String email;
+	private String avatarUrl;
 
 	public Account() {
 	}
@@ -30,6 +31,16 @@ public class Account extends AbstractEntity<Integer> implements CurrentAccount {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	
+
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 
 	@Override

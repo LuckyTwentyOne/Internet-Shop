@@ -1,14 +1,23 @@
 package ua.kh.butov.ishop.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +52,24 @@ class OrderServiceImpl implements OrderService {
 			.getListResultSetHandler(ResultSetHandlerFactory.ORDER_ITEM_RESULT_SET_HANDLER);
 	private final ResultSetHandler<Integer> countResultSetHandler = ResultSetHandlerFactory.getCountResultSetHandler();
 	private final DataSource dataSource;
+	private final String rootDir;
 
-	public OrderServiceImpl(DataSource dataSource) {
+	private String smtpHost;
+	private String smtpPort;
+	private String smtpUsername;
+	private String smtpPassword;
+	private String host;
+	private String fromAddress;
+
+	public OrderServiceImpl(DataSource dataSource, ServiceManager serviceManager) {
 		this.dataSource = dataSource;
+		this.rootDir = serviceManager.getApplicationProperty("app.avatar.root.dir");
+		this.smtpHost = serviceManager.getApplicationProperty("email.smtp.server");
+		this.smtpPort = serviceManager.getApplicationProperty("email.smtp.port");
+		this.smtpUsername = serviceManager.getApplicationProperty("email.smtp.username");
+		this.smtpPassword = serviceManager.getApplicationProperty("email.smtp.password");
+		this.host = serviceManager.getApplicationProperty("app.host");
+		this.fromAddress = serviceManager.getApplicationProperty("email.smtp.fromAddress");
 	}
 
 	@Override
@@ -104,14 +128,25 @@ class OrderServiceImpl implements OrderService {
 			Account account = JDBCUtils.select(c, "select * from account where email=?", accountResultSetHandler,
 					socialAccount.getEmail());
 			if (account == null) {
-				account = new Account(socialAccount.getName(), socialAccount.getEmail());
-				account = JDBCUtils.insert(c, "insert into account values (nextval('account_seq'),?,?)",
-						accountResultSetHandler, account.getName(), account.getEmail());
+				String uniqFileName = UUID.randomUUID().toString() + ".jpg";
+				Path filePathToSave = Paths.get(rootDir + "/" + uniqFileName);
+				downloadAvatar(socialAccount.getAvatarUrl(), filePathToSave);
+				account = JDBCUtils.insert(c, "insert into account values (nextval('account_seq'),?,?,?)",
+						accountResultSetHandler, socialAccount.getName(), socialAccount.getEmail(),
+						"/iShop/media/avatar/" + uniqFileName);
 				c.commit();
 			}
 			return account;
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+		} catch (IOException e) {
+			throw new InternalServerErrorException("Can't process avatar link", e);
+		}
+	}
+
+	protected void downloadAvatar(String avatarUrl, Path filePathToSave) throws IOException {
+		try (InputStream in = new URL(avatarUrl).openStream()) {
+			Files.copy(in, filePathToSave);
 		}
 	}
 
@@ -126,9 +161,28 @@ class OrderServiceImpl implements OrderService {
 			JDBCUtils.insertBatch(c, "insert into order_item values(nextval('order_item_seq'),?,?,?)",
 					toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
 			c.commit();
+			sendEmail(currentAccount.getEmail(), order);
 			return order.getId();
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+		}
+	}
+
+	private void sendEmail(String emailAddress, Order order) {
+		try {
+			SimpleEmail email = new SimpleEmail();
+			email.setCharset("utf-8");
+			email.setHostName(smtpHost);
+			email.setSSLOnConnect(true);
+			email.setSslSmtpPort(smtpPort);
+			email.setFrom(fromAddress);
+			email.setAuthenticator(new DefaultAuthenticator(smtpUsername, smtpPassword));
+			email.setSubject("New order");
+			email.setMsg(host + "/order?id=" + order.getId());
+			email.addTo(emailAddress);
+			email.send();
+		} catch (Exception e) {
+			LOGGER.error("Error during send email: " + e.getMessage(), e);
 		}
 	}
 
