@@ -11,6 +11,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ua.kh.butov.ishop.framework.factory.JDBCTransactionalServiceFactory;
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.ProductService;
 import ua.kh.butov.ishop.service.SocialService;
@@ -27,8 +28,10 @@ public class ServiceManager {
 	private ServiceManager(ServletContext context) {
 		loadApplicationProperties();
 		dataSource = createDataSource();
-		productService = new ProductServiceImpl(dataSource);
-		orderService = new OrderServiceImpl(dataSource, this);
+		productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource,
+				new ProductServiceImpl());
+		orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource,
+				new OrderServiceImpl(this));
 		socialService = new FacebookSocialService(this);
 	}
 
