@@ -1,10 +1,13 @@
 package ua.kh.butov.ishop.entity;
 
+import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+
 public class Category extends AbstractEntity<Integer> {
 	private static final long serialVersionUID = -6041136051105166722L;
 	
 	private String name;
 	private String url;
+	@Column("product_count")
 	private Integer productCount;
 
 	public String getName() {

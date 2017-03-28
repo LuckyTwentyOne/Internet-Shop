@@ -2,10 +2,13 @@ package ua.kh.butov.ishop.entity;
 
 import java.math.BigDecimal;
 
+import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+
 public class Product extends AbstractEntity<Integer> {
 	private static final long serialVersionUID = 6307696364153734237L;
 	private String name;
 	private String description;
+	@Column("image_link")
 	private String imageLink;
 	private BigDecimal price;
 	private String category;

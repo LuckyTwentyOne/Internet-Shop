@@ -1,4 +1,4 @@
-package ua.kh.butov.ishop.service.jdbc;
+package ua.kh.butov.ishop.framework.handler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

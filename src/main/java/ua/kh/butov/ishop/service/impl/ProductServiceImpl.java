@@ -15,22 +15,20 @@ import ua.kh.butov.ishop.entity.Producer;
 import ua.kh.butov.ishop.entity.Product;
 import ua.kh.butov.ishop.exception.InternalServerErrorException;
 import ua.kh.butov.ishop.form.SearchForm;
+import ua.kh.butov.ishop.framework.handler.DefaultListResultSetHandler;
+import ua.kh.butov.ishop.framework.handler.IntResultSetHandler;
+import ua.kh.butov.ishop.framework.handler.ResultSetHandler;
 import ua.kh.butov.ishop.service.ProductService;
 import ua.kh.butov.ishop.service.jdbc.JDBCUtils;
-import ua.kh.butov.ishop.service.jdbc.ResultSetHandler;
-import ua.kh.butov.ishop.service.jdbc.ResultSetHandlerFactory;
 import ua.kh.butov.ishop.service.jdbc.SearchQuery;
 
 class ProductServiceImpl implements ProductService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
-	private final ResultSetHandler<List<Product>> productsResultSetHandler = ResultSetHandlerFactory
-			.getListResultSetHandler(ResultSetHandlerFactory.PRODUCT_RESULT_SET_HANDLER);
-	private final ResultSetHandler<List<Category>> categoryListResultSetHandler = ResultSetHandlerFactory
-			.getListResultSetHandler(ResultSetHandlerFactory.CATEGORY_RESULT_SET_HANDLER);
-	private final ResultSetHandler<List<Producer>> producerListResultSetHandler = ResultSetHandlerFactory
-			.getListResultSetHandler(ResultSetHandlerFactory.PRODUCER_RESULT_SET_HANDLER);
-	private final ResultSetHandler<Integer> countResultSetHandler = ResultSetHandlerFactory.getCountResultSetHandler();
+	private final ResultSetHandler<List<Product>> productsResultSetHandler = new DefaultListResultSetHandler<>(Product.class);
+	private final ResultSetHandler<List<Category>> categoryListResultSetHandler = new DefaultListResultSetHandler<>(Category.class);
+	private final ResultSetHandler<List<Producer>> producerListResultSetHandler = new DefaultListResultSetHandler<>(Producer.class);
+	private final ResultSetHandler<Integer> countResultSetHandler = new IntResultSetHandler();
 	private final DataSource dataSource;
 
 	public ProductServiceImpl(DataSource dataSource) {

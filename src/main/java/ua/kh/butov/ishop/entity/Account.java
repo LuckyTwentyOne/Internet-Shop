@@ -1,5 +1,6 @@
 package ua.kh.butov.ishop.entity;
 
+import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
 import ua.kh.butov.ishop.model.CurrentAccount;
 
 public class Account extends AbstractEntity<Integer> implements CurrentAccount {
@@ -7,6 +8,7 @@ public class Account extends AbstractEntity<Integer> implements CurrentAccount {
 
 	private String name;
 	private String email;
+	@Column("avatar_url")
 	private String avatarUrl;
 
 	public Account() {

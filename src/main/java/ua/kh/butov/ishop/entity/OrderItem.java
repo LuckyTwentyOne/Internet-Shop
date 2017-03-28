@@ -1,10 +1,15 @@
 package ua.kh.butov.ishop.entity;
 
+import ua.kh.butov.ishop.framework.annotation.jdbc.Child;
+import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+
 public class OrderItem extends AbstractEntity<Long>{
 	private static final long serialVersionUID = -1612828752958099857L;
+	@Column("id_order")
 	private Long idOrder;
+	@Child(columnName="pid")
 	private Product product;
-	private int count;
+	private Integer count;
 
 	public OrderItem(Product product, int count) {
 		this.product = product;
@@ -31,11 +36,11 @@ public class OrderItem extends AbstractEntity<Long>{
 		this.product = product;
 	}
 
-	public int getCount() {
+	public Integer getCount() {
 		return count;
 	}
 
-	public void setCount(int count) {
+	public void setCount(Integer count) {
 		this.count = count;
 	}
 

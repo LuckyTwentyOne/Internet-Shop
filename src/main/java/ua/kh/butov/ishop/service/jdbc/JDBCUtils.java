@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import ua.kh.butov.ishop.framework.handler.ResultSetHandler;
+
 public final class JDBCUtils {
 
 	public static <T> T select(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters) throws SQLException {

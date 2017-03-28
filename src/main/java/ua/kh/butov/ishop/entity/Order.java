@@ -4,10 +4,14 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
+import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+import ua.kh.butov.ishop.framework.annotation.jdbc.Transient;
+
 public class Order extends AbstractEntity<Long>{
 	private static final long serialVersionUID = 1375749915108285716L;
-	
+	@Column("id_account")
 	private Integer idAccount;
+	@Transient
 	private List<OrderItem> items;
 	private Timestamp created;
 

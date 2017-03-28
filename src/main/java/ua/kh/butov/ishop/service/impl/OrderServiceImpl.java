@@ -29,28 +29,25 @@ import ua.kh.butov.ishop.exception.AccessDeniedException;
 import ua.kh.butov.ishop.exception.InternalServerErrorException;
 import ua.kh.butov.ishop.exception.ResourceNotFoundException;
 import ua.kh.butov.ishop.form.ProductForm;
+import ua.kh.butov.ishop.framework.handler.DefaultListResultSetHandler;
+import ua.kh.butov.ishop.framework.handler.DefaultUniqueResultSetHandler;
+import ua.kh.butov.ishop.framework.handler.IntResultSetHandler;
+import ua.kh.butov.ishop.framework.handler.ResultSetHandler;
 import ua.kh.butov.ishop.model.CurrentAccount;
 import ua.kh.butov.ishop.model.ShoppingCart;
 import ua.kh.butov.ishop.model.ShoppingCartItem;
 import ua.kh.butov.ishop.model.SocialAccount;
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.jdbc.JDBCUtils;
-import ua.kh.butov.ishop.service.jdbc.ResultSetHandler;
-import ua.kh.butov.ishop.service.jdbc.ResultSetHandlerFactory;
 
 class OrderServiceImpl implements OrderService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-	private static final ResultSetHandler<Product> productResultSetHandler = ResultSetHandlerFactory
-			.getSingleResultSetHandler(ResultSetHandlerFactory.PRODUCT_RESULT_SET_HANDLER);
-	private static final ResultSetHandler<Account> accountResultSetHandler = ResultSetHandlerFactory
-			.getSingleResultSetHandler(ResultSetHandlerFactory.ACCOUNT_RESULT_SET_HANDLER);
-	private final ResultSetHandler<Order> orderResultSetHandler = ResultSetHandlerFactory
-			.getSingleResultSetHandler(ResultSetHandlerFactory.ORDER_RESULT_SET_HANDLER);
-	private final ResultSetHandler<List<Order>> listOrdersResultSetHandler = ResultSetHandlerFactory
-			.getListResultSetHandler(ResultSetHandlerFactory.ORDER_RESULT_SET_HANDLER);
-	private final ResultSetHandler<List<OrderItem>> orderItemListResultSetHandler = ResultSetHandlerFactory
-			.getListResultSetHandler(ResultSetHandlerFactory.ORDER_ITEM_RESULT_SET_HANDLER);
-	private final ResultSetHandler<Integer> countResultSetHandler = ResultSetHandlerFactory.getCountResultSetHandler();
+	private final ResultSetHandler<Product> productResultSetHandler = new DefaultUniqueResultSetHandler<>(Product.class);
+	private final ResultSetHandler<Account> accountResultSetHandler = new DefaultUniqueResultSetHandler<>(Account.class);
+	private final ResultSetHandler<Order> orderResultSetHandler = new DefaultUniqueResultSetHandler<>(Order.class);
+	private final ResultSetHandler<List<OrderItem>> orderItemListResultSetHandler = new DefaultListResultSetHandler<>(OrderItem.class);
+	private final ResultSetHandler<List<Order>> ordersResultSetHandler = new DefaultListResultSetHandler<>(Order.class);
+	private final ResultSetHandler<Integer> countResultSetHandler = new IntResultSetHandler();
 	private final DataSource dataSource;
 	private final String rootDir;
 
@@ -206,8 +203,8 @@ class OrderServiceImpl implements OrderService {
 						"Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
 			}
 			List<OrderItem> list = JDBCUtils.select(c,
-					"select o.id as oid, o.id_order as id_order, o.id_product, o.count, p.*, c.name as category, pr.name as producer from order_item o, product p, category c, producer pr "
-							+ "where pr.id=p.id_producer and c.id=p.id_category and o.id_product=p.id and o.id_order=?",
+					"select o.id, o.id_order, o.id_product, o.count, p.id as pid, p.name, p.description, p.price, p.image_link, c.name as category, pr.name as producer"
+					+ " from order_item o, product p, category c, producer pr where pr.id=p.id_producer and c.id=p.id_category and o.id_product=p.id and o.id_order=?",
 					orderItemListResultSetHandler, id);
 			order.setItems(list);
 			return order;
@@ -222,7 +219,7 @@ class OrderServiceImpl implements OrderService {
 			int offset = (page - 1) * limit;
 			return JDBCUtils.select(c,
 					"select * from \"order\" where id_account=? order by created desc limit ? offset ?",
-					listOrdersResultSetHandler, currentAccount.getId(), limit, offset);
+					ordersResultSetHandler, currentAccount.getId(), limit, offset);
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}
