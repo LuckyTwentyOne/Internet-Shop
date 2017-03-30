@@ -12,7 +12,7 @@ import ua.kh.butov.ishop.framework.converter.Converter;
 import ua.kh.butov.ishop.framework.converter.DefaultConverter;
 import ua.kh.butov.ishop.framework.util.ReflectionUtils;
 
-class DefaultResultSetHandler<T> implements ResultSetHandler<T> {
+public class DefaultResultSetHandler<T> implements ResultSetHandler<T> {
 
 	protected final Class<T> entityClass;
 	protected final Converter converter;
