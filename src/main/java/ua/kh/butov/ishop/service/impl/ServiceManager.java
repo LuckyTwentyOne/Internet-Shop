@@ -12,6 +12,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ua.kh.butov.ishop.framework.factory.JDBCTransactionalServiceFactory;
+import ua.kh.butov.ishop.repository.AccountRepository;
+import ua.kh.butov.ishop.repository.CategoryRepository;
+import ua.kh.butov.ishop.repository.OrderItemRepository;
+import ua.kh.butov.ishop.repository.OrderRepository;
+import ua.kh.butov.ishop.repository.ProducerRepository;
+import ua.kh.butov.ishop.repository.ProductRepository;
+import ua.kh.butov.ishop.repository.impl.AccountRepositoryImpl;
+import ua.kh.butov.ishop.repository.impl.CategoryRepositoryImpl;
+import ua.kh.butov.ishop.repository.impl.OrderItemRepositoryImpl;
+import ua.kh.butov.ishop.repository.impl.OrderRepositoryImpl;
+import ua.kh.butov.ishop.repository.impl.ProducerRepositoryImpl;
+import ua.kh.butov.ishop.repository.impl.ProductRepositoryImpl;
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.ProductService;
 import ua.kh.butov.ishop.service.SocialService;
@@ -25,11 +37,24 @@ public class ServiceManager {
 	private final SocialService socialService;
 	private final Properties applicationProperties = new Properties();
 
+	final OrderItemRepository orderItemRepository;
+	final OrderRepository orderRepository;
+	final ProductRepository productRepository;
+	final ProducerRepository producerRepository;
+	final CategoryRepository categoryRepository;
+	final AccountRepository accountRepository;
+
 	private ServiceManager(ServletContext context) {
 		loadApplicationProperties();
 		dataSource = createDataSource();
+		productRepository = new ProductRepositoryImpl();
+		producerRepository = new ProducerRepositoryImpl();
+		categoryRepository = new CategoryRepositoryImpl();
+		accountRepository = new AccountRepositoryImpl();
+		orderRepository = new OrderRepositoryImpl();
+		orderItemRepository = new OrderItemRepositoryImpl();
 		productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource,
-				new ProductServiceImpl());
+				new ProductServiceImpl(this));
 		orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource,
 				new OrderServiceImpl(this));
 		socialService = new FacebookSocialService(this);

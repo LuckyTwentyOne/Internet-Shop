@@ -1,4 +1,4 @@
-package ua.kh.butov.ishop.service.jdbc;
+package ua.kh.butov.ishop.jdbc;
 
 import java.util.List;
 
