@@ -5,7 +5,7 @@
   <a class="pull-right" data-toggle="collapse" href="#productCatalog">Product catalog <span class="caret"></span></a>
   <a data-toggle="collapse" href="#findProducts">Find products <span class="caret"></span></a>
 </div>
-<form class="search" action="search">
+<form class="search" action="/iShop/search">
 	<div id="findProducts" class="panel panel-success collapse">
        <div class="panel-heading">Find products</div>       
        <div class="panel-body">
@@ -22,7 +22,6 @@
 	        <div id="searchOptions" class="collapse ${searchForm.categoriesNotEmpty or searchForm.producersNotEmpty ? 'in' : ''}">
 				<ishop:category-filter categories="${CATEGORY_LIST }" searchForm="${searchForm }"/>
 				<ishop:producer-filter producers="${PRODUCER_LIST }" searchForm="${searchForm }"/>
-				<ishop:sign-in classes="navbar-btn navbar-right sign-in" />
 			</div>
 	</div>
 </form>
