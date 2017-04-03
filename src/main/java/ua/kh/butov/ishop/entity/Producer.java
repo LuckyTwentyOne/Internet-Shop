@@ -1,7 +1,9 @@
 package ua.kh.butov.ishop.entity;
 
 import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
 
+@Table(name="product")
 public class Producer extends AbstractEntity<Integer> {
 	private static final long serialVersionUID = -320441763179477663L;
 

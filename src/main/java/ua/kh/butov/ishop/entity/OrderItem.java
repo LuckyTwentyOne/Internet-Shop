@@ -2,12 +2,14 @@ package ua.kh.butov.ishop.entity;
 
 import ua.kh.butov.ishop.framework.annotation.jdbc.Child;
 import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
 
+@Table(name="order_item", nextIdExpression="nextval('order_item_seq')")
 public class OrderItem extends AbstractEntity<Long>{
 	private static final long serialVersionUID = -1612828752958099857L;
 	@Column("id_order")
 	private Long idOrder;
-	@Child(columnName="pid")
+	@Child(columnName="id_product")
 	private Product product;
 	private Integer count;
 

@@ -1,8 +1,10 @@
 package ua.kh.butov.ishop.entity;
 
 import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
 import ua.kh.butov.ishop.model.CurrentAccount;
 
+@Table(name="account", nextIdExpression="nextval('account_seq')")
 public class Account extends AbstractEntity<Integer> implements CurrentAccount {
 	private static final long serialVersionUID = -6889352515111174105L;
 

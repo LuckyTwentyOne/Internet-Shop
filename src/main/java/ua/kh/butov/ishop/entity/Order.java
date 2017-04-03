@@ -5,8 +5,10 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
+import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
 import ua.kh.butov.ishop.framework.annotation.jdbc.Transient;
 
+@Table(name="\"order\"", nextIdExpression="nextval('order_seq')")
 public class Order extends AbstractEntity<Long>{
 	private static final long serialVersionUID = 1375749915108285716L;
 	@Column("id_account")

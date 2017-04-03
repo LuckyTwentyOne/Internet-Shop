@@ -13,16 +13,15 @@ import ua.kh.butov.ishop.framework.converter.DefaultConverter;
 import ua.kh.butov.ishop.framework.util.ReflectionUtils;
 
 public class DefaultResultSetHandler<T> implements ResultSetHandler<T> {
-
 	protected final Class<T> entityClass;
 	protected final Converter converter;
 
-	DefaultResultSetHandler(Class<T> entityClass, Converter converter) {
+	public DefaultResultSetHandler(Class<T> entityClass, Converter converter) {
 		this.entityClass = entityClass;
 		this.converter = converter;
 	}
 
-	DefaultResultSetHandler(Class<T> entityClass) {
+	public DefaultResultSetHandler(Class<T> entityClass) {
 		this(entityClass, new DefaultConverter());
 	}
 
@@ -42,8 +41,8 @@ public class DefaultResultSetHandler<T> implements ResultSetHandler<T> {
 		}
 	}
 
-	protected void populateFields(List<Field> fields, Object entity, List<String> columns, ResultSet rs)
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, SQLException {
+	protected void populateFields(List<Field> fields, Object entity, List<String> columns, ResultSet rs) 
+				throws InstantiationException, IllegalAccessException, IllegalArgumentException, SQLException {
 		for (Field field : fields) {
 			Class<?> fieldClass = field.getType();
 			Child child = field.getAnnotation(Child.class);
@@ -55,9 +54,8 @@ public class DefaultResultSetHandler<T> implements ResultSetHandler<T> {
 		}
 	}
 
-	protected void populateChildField(Child child, Class<?> fieldClass, Field field, Object entity, ResultSet rs,
-			List<String> columns)
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, SQLException {
+	protected void populateChildField(Child child, Class<?> fieldClass, Field field, Object entity, ResultSet rs, List<String> columns) 
+				throws InstantiationException, IllegalAccessException, IllegalArgumentException, SQLException {
 		Object embeddedInstance = fieldClass.newInstance();
 		field.set(entity, embeddedInstance);
 		List<Field> embeddedInstanceFields = ReflectionUtils.getAccessibleEntityFields(fieldClass);
@@ -66,8 +64,8 @@ public class DefaultResultSetHandler<T> implements ResultSetHandler<T> {
 		idField.set(embeddedInstance, rs.getObject(child.columnName()));
 	}
 
-	protected void populateSimpleField(Class<?> fieldClass, Field field, Object entity, ResultSet rs,
-			List<String> columns) throws SQLException, IllegalArgumentException, IllegalAccessException {
+	protected void populateSimpleField(Class<?> fieldClass, Field field, Object entity, ResultSet rs, List<String> columns) 
+			throws SQLException, IllegalArgumentException, IllegalAccessException {
 		String columnName = ReflectionUtils.getColumnNameForField(field);
 		if (columns.contains(columnName)) {
 			Object valueFromDB = rs.getObject(columnName);
