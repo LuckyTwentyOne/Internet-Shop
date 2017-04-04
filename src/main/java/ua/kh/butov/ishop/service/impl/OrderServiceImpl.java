@@ -1,24 +1,16 @@
 package ua.kh.butov.ishop.service.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
-import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ua.kh.butov.framework.annotation.Autowired;
 import ua.kh.butov.framework.annotation.Component;
-import ua.kh.butov.framework.annotation.Value;
 import ua.kh.butov.framework.annotation.jdbc.Transactional;
+import ua.kh.butov.framework.factory.TransactionSynchronization;
+import ua.kh.butov.framework.factory.TransactionSynchronizationManager;
 import ua.kh.butov.ishop.entity.Account;
 import ua.kh.butov.ishop.entity.Order;
 import ua.kh.butov.ishop.entity.OrderItem;
@@ -35,12 +27,15 @@ import ua.kh.butov.ishop.repository.AccountRepository;
 import ua.kh.butov.ishop.repository.OrderItemRepository;
 import ua.kh.butov.ishop.repository.OrderRepository;
 import ua.kh.butov.ishop.repository.ProductRepository;
+import ua.kh.butov.ishop.service.AvatarService;
+import ua.kh.butov.ishop.service.CookieService;
+import ua.kh.butov.ishop.service.NotificationService;
 import ua.kh.butov.ishop.service.OrderService;
 
 @Component
 public class OrderServiceImpl implements OrderService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-	
+
 	@Autowired
 	private AccountRepository accountRepository;
 	@Autowired
@@ -49,29 +44,20 @@ public class OrderServiceImpl implements OrderService {
 	private OrderRepository orderRepository;
 	@Autowired
 	private ProductRepository productRepository;
-	
-	@Value("app.avatar.root.dir")
-	private String rootDir;
-	
-	@Value("email.smtp.server")
-	private String smtpHost;
-	@Value("email.smtp.port")
-	private String smtpPort;
-	@Value("email.smtp.username")
-	private String smtpUsername;
-	@Value("email.smtp.password")
-	private String smtpPassword;
-	@Value("app.host")
-	private String host;
-	@Value("email.smtp.fromAddress")
-	private String fromAddress;
+
+	@Autowired
+	private CookieService cookieService;
+	@Autowired
+	private AvatarService avatarService;
+	@Autowired
+	private NotificationService notificationService;
 
 	@Override
 	@Transactional
 	public void addProductToShoppingCart(ProductForm productForm, ShoppingCart shoppingCart) {
 		Product product = productRepository.findById(productForm.getIdProduct());
-		if(product == null) {
-			throw new InternalServerErrorException("Product not found by id="+productForm.getIdProduct());
+		if (product == null) {
+			throw new InternalServerErrorException("Product not found by id=" + productForm.getIdProduct());
 		}
 		shoppingCart.addProduct(product, productForm.getCount());
 	}
@@ -83,27 +69,17 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public String serializeShoppingCart(ShoppingCart shoppingCart) {
-		StringBuilder res = new StringBuilder();
-		for (ShoppingCartItem item : shoppingCart.getItems()) {
-			res.append(item.getProduct().getId()).append("-").append(item.getCount()).append("|");
-		}
-		if (res.length() > 0) {
-			res.deleteCharAt(res.length() - 1);
-		}
-		return res.toString();
+		return cookieService.createShoppingCartCookie(shoppingCart.getItems());
 	}
 
 	@Override
 	@Transactional
-	public ShoppingCart deserializeShoppingCart(String string) {
+	public ShoppingCart deserializeShoppingCart(String cookieValue) {
 		ShoppingCart shoppingCart = new ShoppingCart();
-		String[] items = string.split("\\|");
-		for (String item : items) {
+		List<ProductForm> items = cookieService.parseShoppingCartCookie(cookieValue);
+		for (ProductForm item : items) {
 			try {
-				String data[] = item.split("-");
-				int idProduct = Integer.parseInt(data[0]);
-				int count = Integer.parseInt(data[1]);
-				addProductToShoppingCart(new ProductForm(idProduct, count), shoppingCart);
+				addProductToShoppingCart(item, shoppingCart);
 			} catch (RuntimeException e) {
 				LOGGER.error("Can't add product to ShoppingCart during deserialization: item=" + item, e);
 			}
@@ -112,63 +88,38 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	@Transactional(readOnly=false)
+	@Transactional(readOnly = false)
 	public CurrentAccount authentificate(SocialAccount socialAccount) {
-		try{
-			Account account = accountRepository.findByEmail(socialAccount.getEmail());
-			if (account == null) {
-				String uniqFileName = UUID.randomUUID().toString() + ".jpg";
-				Path filePathToSave = Paths.get(rootDir + "/" + uniqFileName);
-				downloadAvatar(socialAccount.getAvatarUrl(), filePathToSave);
-				account = new Account(socialAccount.getName(), socialAccount.getEmail(), "/iShop/media/avatar/" + uniqFileName);
-				accountRepository.create(account);
-			}
-			return account;
-		} catch (IOException e) {
-			throw new InternalServerErrorException("Can't process avatar link", e);
+		Account account = accountRepository.findByEmail(socialAccount.getEmail());
+		if (account == null) {
+			String avatarUrl = avatarService.processAvatarLink(socialAccount.getAvatarUrl());
+			account = new Account(socialAccount.getName(), socialAccount.getEmail(), avatarUrl);
+			accountRepository.create(account);
 		}
-	}
-
-	protected void downloadAvatar(String avatarUrl, Path filePathToSave) throws IOException {
-		try (InputStream in = new URL(avatarUrl).openStream()) {
-			Files.copy(in, filePathToSave);
-		}
+		return account;
 	}
 
 	@Override
-	@Transactional(readOnly=false)
-	public long makeOrder(ShoppingCart shoppingCart, CurrentAccount currentAccount) {
+	@Transactional(readOnly = false)
+	public long makeOrder(ShoppingCart shoppingCart, final CurrentAccount currentAccount) {
 		validateShoppingCart(shoppingCart);
-		Order order = new Order(currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
+		final Order order = new Order(currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
 		orderRepository.create(order);
 		for (ShoppingCartItem item : shoppingCart.getItems()) {
 			orderItemRepository.create(new OrderItem(order.getId(), item.getProduct(), item.getCount()));
 		}
-		sendEmail(currentAccount.getEmail(), order);
+		TransactionSynchronizationManager.addSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				notificationService.sendNewOrderCreatedNotification(currentAccount.getEmail(), order);
+			}
+		});
 		return order.getId();
 	}
-	
-	private void validateShoppingCart (ShoppingCart shoppingCart) {
+
+	private void validateShoppingCart(ShoppingCart shoppingCart) {
 		if (shoppingCart == null || shoppingCart.getItems().isEmpty()) {
 			throw new InternalServerErrorException("shoppingCart is null or empty");
-		}
-	}
-
-	private void sendEmail(String emailAddress, Order order) {
-		try {
-			SimpleEmail email = new SimpleEmail();
-			email.setCharset("utf-8");
-			email.setHostName(smtpHost);
-			email.setSSLOnConnect(true);
-			email.setSslSmtpPort(smtpPort);
-			email.setFrom(fromAddress);
-			email.setAuthenticator(new DefaultAuthenticator(smtpUsername, smtpPassword));
-			email.setSubject("New order");
-			email.setMsg(host + "/order?id=" + order.getId());
-			email.addTo(emailAddress);
-			email.send();
-		} catch (Exception e) {
-			LOGGER.error("Error during send email: " + e.getMessage(), e);
 		}
 	}
 
@@ -180,7 +131,8 @@ public class OrderServiceImpl implements OrderService {
 			throw new ResourceNotFoundException("Order not found by id: " + id);
 		}
 		if (!order.getIdAccount().equals(currentAccount.getId())) {
-			throw new AccessDeniedException("Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
+			throw new AccessDeniedException(
+					"Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
 		}
 		order.setItems(orderItemRepository.findByIdOrder(id));
 		return order;

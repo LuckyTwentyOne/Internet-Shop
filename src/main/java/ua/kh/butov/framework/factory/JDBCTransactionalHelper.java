@@ -3,6 +3,7 @@ package ua.kh.butov.framework.factory;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -35,8 +36,10 @@ class JDBCTransactionalHelper {
 
 	private Object invokeNotReadOnlyTransactional(Connection c, Method method, Object[] args) throws Exception {
 		try {
+			TransactionSynchronizationManager.initSynchronization();
 			Object result = method.invoke(realService, args);
 			c.commit();
+			afterCommit();
 			return result;
 		} catch (Exception e) {
 			if (e instanceof RuntimeException) {
@@ -45,6 +48,15 @@ class JDBCTransactionalHelper {
 				c.commit();
 			}
 			throw e;
+		} finally {
+			TransactionSynchronizationManager.clearSynchronization();
+		}
+	}
+
+	private void afterCommit() {
+		List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
+		for (TransactionSynchronization synchronization : synchronizations) {
+			synchronization.afterCommit();
 		}
 	}
 }
