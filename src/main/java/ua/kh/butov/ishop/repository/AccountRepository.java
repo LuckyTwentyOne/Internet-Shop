@@ -1,9 +1,10 @@
 package ua.kh.butov.ishop.repository;
 
+import ua.kh.butov.framework.annotation.JDBCRepository;
+import ua.kh.butov.framework.annotation.jdbc.Insert;
+import ua.kh.butov.framework.annotation.jdbc.Select;
 import ua.kh.butov.ishop.entity.Account;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Insert;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Select;
-
+@JDBCRepository
 public interface AccountRepository {
 
 	@Select("select * from account where email=?")

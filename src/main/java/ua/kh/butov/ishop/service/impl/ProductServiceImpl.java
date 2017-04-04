@@ -2,27 +2,27 @@ package ua.kh.butov.ishop.service.impl;
 
 import java.util.List;
 
+import ua.kh.butov.framework.annotation.Autowired;
+import ua.kh.butov.framework.annotation.Component;
+import ua.kh.butov.framework.annotation.jdbc.Transactional;
 import ua.kh.butov.ishop.entity.Category;
 import ua.kh.butov.ishop.entity.Producer;
 import ua.kh.butov.ishop.entity.Product;
 import ua.kh.butov.ishop.form.SearchForm;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Transactional;
 import ua.kh.butov.ishop.repository.CategoryRepository;
 import ua.kh.butov.ishop.repository.ProducerRepository;
 import ua.kh.butov.ishop.repository.ProductRepository;
 import ua.kh.butov.ishop.service.ProductService;
 
+@Component
 @Transactional
 public class ProductServiceImpl implements ProductService {
-	private final ProductRepository productRepository;
-	private final ProducerRepository producerRepository;
-	private final CategoryRepository categoryRepository;
-	
-	public ProductServiceImpl(ServiceManager serviceManager) {
-		this.productRepository = serviceManager.productRepository;
-		this.producerRepository = serviceManager.producerRepository;
-		this.categoryRepository = serviceManager.categoryRepository;
-	}
+	@Autowired
+	private ProductRepository productRepository;
+	@Autowired
+	private ProducerRepository producerRepository;
+	@Autowired
+	private CategoryRepository categoryRepository;
 
 	@Override
 	public List<Product> listAllProducts(int page, int limit) {

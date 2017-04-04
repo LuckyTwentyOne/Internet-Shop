@@ -3,9 +3,9 @@ package ua.kh.butov.ishop.repository.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import ua.kh.butov.framework.SQLBuilder;
+import ua.kh.butov.framework.SearchQuery;
 import ua.kh.butov.ishop.form.SearchForm;
-import ua.kh.butov.ishop.framework.SQLBuilder;
-import ua.kh.butov.ishop.framework.SearchQuery;
 
 public abstract class AbstractSearchFormSQLBuilder implements SQLBuilder {
 

@@ -9,18 +9,22 @@ import com.restfb.scope.ExtendedPermissions;
 import com.restfb.scope.ScopeBuilder;
 import com.restfb.types.User;
 
+import ua.kh.butov.framework.annotation.Component;
+import ua.kh.butov.framework.annotation.Value;
 import ua.kh.butov.ishop.model.SocialAccount;
 import ua.kh.butov.ishop.service.SocialService;
 
+@Component
 public class FacebookSocialService implements SocialService {
-	private final String idClient;
-	private final String secret;
-	private final String redirectUrl;
-
-	FacebookSocialService(ServiceManager serviceManager) {
-		idClient = serviceManager.getApplicationProperty("social.facebook.idClient");
-		secret = serviceManager.getApplicationProperty("social.facebook.secret");
-		redirectUrl = serviceManager.getApplicationProperty("app.host") + "/from-social";
+	@Value("social.facebook.idClient")
+	private String idClient;
+	@Value("social.facebook.secret")
+	private String secret;
+	@Value("app.host")
+	private String host;
+	
+	private String getRedirectUrl() {
+		return host + "/from-social";
 	}
 
 	@Override
@@ -28,13 +32,13 @@ public class FacebookSocialService implements SocialService {
 		ScopeBuilder scopeBuilder = new ScopeBuilder();
 		scopeBuilder.addPermission(ExtendedPermissions.EMAIL);
 		FacebookClient client = new DefaultFacebookClient(Version.VERSION_2_5);
-		return client.getLoginDialogUrl(idClient, redirectUrl, scopeBuilder);
+		return client.getLoginDialogUrl(idClient, getRedirectUrl(), scopeBuilder);
 	}
 
 	@Override
 	public SocialAccount getSocialAccount(String authToken) {
 		FacebookClient client = new DefaultFacebookClient(Version.VERSION_2_5);
-		AccessToken accessToken = client.obtainUserAccessToken(idClient, secret, redirectUrl, authToken);
+		AccessToken accessToken = client.obtainUserAccessToken(idClient, secret, getRedirectUrl(), authToken);
 		client = new DefaultFacebookClient(accessToken.getAccessToken(), Version.VERSION_2_5);
 		User user = client.fetchObject("me", User.class, Parameter.with("fields", "name,email,first_name,last_name"));
 		String avatarUrl = String.format("https://graph.facebook.com/v2.7/%s/picture?type=small", user.getId());

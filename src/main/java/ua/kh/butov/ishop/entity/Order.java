@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
-import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Transient;
+import ua.kh.butov.framework.annotation.jdbc.Column;
+import ua.kh.butov.framework.annotation.jdbc.Table;
+import ua.kh.butov.framework.annotation.jdbc.Transient;
 
 @Table(name="\"order\"", nextIdExpression="nextval('order_seq')")
 public class Order extends AbstractEntity<Long>{

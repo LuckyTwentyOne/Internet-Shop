@@ -15,6 +15,10 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ua.kh.butov.framework.annotation.Autowired;
+import ua.kh.butov.framework.annotation.Component;
+import ua.kh.butov.framework.annotation.Value;
+import ua.kh.butov.framework.annotation.jdbc.Transactional;
 import ua.kh.butov.ishop.entity.Account;
 import ua.kh.butov.ishop.entity.Order;
 import ua.kh.butov.ishop.entity.OrderItem;
@@ -23,7 +27,6 @@ import ua.kh.butov.ishop.exception.AccessDeniedException;
 import ua.kh.butov.ishop.exception.InternalServerErrorException;
 import ua.kh.butov.ishop.exception.ResourceNotFoundException;
 import ua.kh.butov.ishop.form.ProductForm;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Transactional;
 import ua.kh.butov.ishop.model.CurrentAccount;
 import ua.kh.butov.ishop.model.ShoppingCart;
 import ua.kh.butov.ishop.model.ShoppingCartItem;
@@ -34,37 +37,34 @@ import ua.kh.butov.ishop.repository.OrderRepository;
 import ua.kh.butov.ishop.repository.ProductRepository;
 import ua.kh.butov.ishop.service.OrderService;
 
+@Component
 public class OrderServiceImpl implements OrderService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-	private final AccountRepository accountRepository;
-	private final OrderItemRepository orderItemRepository;
-	private final OrderRepository orderRepository;
-	private final ProductRepository productRepository;
-
-	private final String rootDir;
-
+	
+	@Autowired
+	private AccountRepository accountRepository;
+	@Autowired
+	private OrderItemRepository orderItemRepository;
+	@Autowired
+	private OrderRepository orderRepository;
+	@Autowired
+	private ProductRepository productRepository;
+	
+	@Value("app.avatar.root.dir")
+	private String rootDir;
+	
+	@Value("email.smtp.server")
 	private String smtpHost;
+	@Value("email.smtp.port")
 	private String smtpPort;
+	@Value("email.smtp.username")
 	private String smtpUsername;
+	@Value("email.smtp.password")
 	private String smtpPassword;
+	@Value("app.host")
 	private String host;
+	@Value("email.smtp.fromAddress")
 	private String fromAddress;
-
-	public OrderServiceImpl(ServiceManager serviceManager) {
-		this.rootDir = serviceManager.getApplicationProperty("app.avatar.root.dir");
-
-		this.smtpHost = serviceManager.getApplicationProperty("email.smtp.server");
-		this.smtpPort = serviceManager.getApplicationProperty("email.smtp.port");
-		this.smtpUsername = serviceManager.getApplicationProperty("email.smtp.username");
-		this.smtpPassword = serviceManager.getApplicationProperty("email.smtp.password");
-		this.host = serviceManager.getApplicationProperty("app.host");
-		this.fromAddress = serviceManager.getApplicationProperty("email.smtp.fromAddress");
-		
-		this.accountRepository = serviceManager.accountRepository;
-		this.orderItemRepository = serviceManager.orderItemRepository;
-		this.orderRepository = serviceManager.orderRepository;
-		this.productRepository = serviceManager.productRepository;
-	}
 
 	@Override
 	@Transactional

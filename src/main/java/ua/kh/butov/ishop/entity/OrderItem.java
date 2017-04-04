@@ -1,8 +1,8 @@
 package ua.kh.butov.ishop.entity;
 
-import ua.kh.butov.ishop.framework.annotation.jdbc.Child;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
+import ua.kh.butov.framework.annotation.jdbc.Child;
+import ua.kh.butov.framework.annotation.jdbc.Column;
+import ua.kh.butov.framework.annotation.jdbc.Table;
 
 @Table(name="order_item", nextIdExpression="nextval('order_item_seq')")
 public class OrderItem extends AbstractEntity<Long>{

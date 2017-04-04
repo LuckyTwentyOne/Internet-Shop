@@ -2,8 +2,8 @@ package ua.kh.butov.ishop.entity;
 
 import java.math.BigDecimal;
 
-import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
+import ua.kh.butov.framework.annotation.jdbc.Column;
+import ua.kh.butov.framework.annotation.jdbc.Table;
 
 @Table(name="producer")
 public class Product extends AbstractEntity<Integer> {

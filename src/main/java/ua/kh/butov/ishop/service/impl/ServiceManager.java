@@ -3,56 +3,37 @@ package ua.kh.butov.ishop.service.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ua.kh.butov.ishop.framework.factory.JDBCRepositoryFactory;
-import ua.kh.butov.ishop.framework.factory.JDBCTransactionalServiceFactory;
-import ua.kh.butov.ishop.repository.AccountRepository;
-import ua.kh.butov.ishop.repository.CategoryRepository;
-import ua.kh.butov.ishop.repository.OrderItemRepository;
-import ua.kh.butov.ishop.repository.OrderRepository;
-import ua.kh.butov.ishop.repository.ProducerRepository;
-import ua.kh.butov.ishop.repository.ProductRepository;
+import ua.kh.butov.framework.factory.DependencyInjectionManager;
 import ua.kh.butov.ishop.service.OrderService;
 import ua.kh.butov.ishop.service.ProductService;
 import ua.kh.butov.ishop.service.SocialService;
 
 public class ServiceManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceManager.class);
-
+	final Properties applicationProperties = new Properties();
 	private final BasicDataSource dataSource;
-	private final ProductService productService;
-	private final OrderService orderService;
-	private final SocialService socialService;
-	private final Properties applicationProperties = new Properties();
-
-	final OrderItemRepository orderItemRepository;
-	final OrderRepository orderRepository;
-	final ProductRepository productRepository;
-	final ProducerRepository producerRepository;
-	final CategoryRepository categoryRepository;
-	final AccountRepository accountRepository;
-
+	final DependencyInjectionManager dependencyInjectionManager;
 	private ServiceManager(ServletContext context) {
 		loadApplicationProperties();
 		dataSource = createDataSource();
-		productRepository = JDBCRepositoryFactory.createRepository(ProductRepository.class);
-		producerRepository = JDBCRepositoryFactory.createRepository(ProducerRepository.class);
-		categoryRepository = JDBCRepositoryFactory.createRepository(CategoryRepository.class);
-		accountRepository = JDBCRepositoryFactory.createRepository(AccountRepository.class);
-		orderRepository = JDBCRepositoryFactory.createRepository(OrderRepository.class);
-		orderItemRepository = JDBCRepositoryFactory.createRepository(OrderItemRepository.class);
-		productService = (ProductService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource,
-				new ProductServiceImpl(this));
-		orderService = (OrderService) JDBCTransactionalServiceFactory.createTransactionalService(dataSource,
-				new OrderServiceImpl(this));
-		socialService = new FacebookSocialService(this);
+		
+		Map<Class<?>, Object> externalDependencies = new HashMap<>();
+		externalDependencies.put(DataSource.class, dataSource);
+		dependencyInjectionManager = new DependencyInjectionManager(applicationProperties, externalDependencies);
+		dependencyInjectionManager.scanPackage("ua.kh.butov.ishop.repository");
+		dependencyInjectionManager.scanPackage("ua.kh.butov.ishop.service.impl");
+		dependencyInjectionManager.injectDependencies();
 	}
 
 	public static ServiceManager getInstance(ServletContext context) {
@@ -65,15 +46,15 @@ public class ServiceManager {
 	}
 
 	public ProductService getProductService() {
-		return productService;
+		return dependencyInjectionManager.getInstance(ProductService.class);
 	}
 
 	public OrderService getOrderService() {
-		return orderService;
+		return dependencyInjectionManager.getInstance(OrderService.class);
 	}
 
 	public SocialService getSocialService() {
-		return socialService;
+		return dependencyInjectionManager.getInstance(SocialService.class);
 	}
 
 	public String getApplicationProperty(String key) {
@@ -91,6 +72,7 @@ public class ServiceManager {
 		} catch (SQLException e) {
 			LOGGER.error("Close datasource failed: " + e.getMessage(), e);
 		}
+		dependencyInjectionManager.destroyInstances();
 	}
 
 	private void loadApplicationProperties() {

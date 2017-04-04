@@ -1,7 +1,7 @@
 package ua.kh.butov.ishop.entity;
 
-import ua.kh.butov.ishop.framework.annotation.jdbc.Column;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Table;
+import ua.kh.butov.framework.annotation.jdbc.Column;
+import ua.kh.butov.framework.annotation.jdbc.Table;
 
 @Table(name="product")
 public class Producer extends AbstractEntity<Integer> {

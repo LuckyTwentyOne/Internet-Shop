@@ -2,11 +2,13 @@ package ua.kh.butov.ishop.repository;
 
 import java.util.List;
 
+import ua.kh.butov.framework.annotation.JDBCRepository;
+import ua.kh.butov.framework.annotation.jdbc.CollectionItem;
+import ua.kh.butov.framework.annotation.jdbc.Insert;
+import ua.kh.butov.framework.annotation.jdbc.Select;
 import ua.kh.butov.ishop.entity.OrderItem;
-import ua.kh.butov.ishop.framework.annotation.jdbc.CollectionItem;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Insert;
-import ua.kh.butov.ishop.framework.annotation.jdbc.Select;
 
+@JDBCRepository
 public interface OrderItemRepository {
 
 	@Select("select o.id, o.id_order, o.id_product, o.count, p.name, "
