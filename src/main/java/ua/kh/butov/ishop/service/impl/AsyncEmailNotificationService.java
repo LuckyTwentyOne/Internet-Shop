@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import ua.kh.butov.framework.annotation.Component;
 import ua.kh.butov.framework.annotation.Value;
-import ua.kh.butov.ishop.entity.Order;
 import ua.kh.butov.ishop.service.NotificationService;
 
 @Component
@@ -27,8 +26,6 @@ public class AsyncEmailNotificationService implements NotificationService {
 	private String smtpUsername;
 	@Value("email.smtp.password")
 	private String smtpPassword;
-	@Value("app.host")
-	private String host;
 	@Value("email.smtp.fromEmail")
 	private String fromEmail;
 	@Value("email.smtp.tryCount")
@@ -38,13 +35,8 @@ public class AsyncEmailNotificationService implements NotificationService {
 		executorService = Executors.newCachedThreadPool();
 	}
 
-	protected String buildNotificationMessage(Order order) {
-		return host + "/order?id=" + order.getId();
-	}
-
 	@Override
-	public void sendNewOrderCreatedNotification(String notificationAddress, Order order) {
-		String content = buildNotificationMessage(order);
+	public void sendNotificationMessage(String notificationAddress, String content) {
 		executorService.submit(new EmailItem(notificationAddress, "New order", content, Integer.parseInt(tryCount)));
 	}
 

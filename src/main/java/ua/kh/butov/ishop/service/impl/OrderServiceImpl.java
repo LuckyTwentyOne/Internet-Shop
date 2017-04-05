@@ -29,6 +29,7 @@ import ua.kh.butov.ishop.repository.OrderRepository;
 import ua.kh.butov.ishop.repository.ProductRepository;
 import ua.kh.butov.ishop.service.AvatarService;
 import ua.kh.butov.ishop.service.CookieService;
+import ua.kh.butov.ishop.service.NotificationContentBuilderService;
 import ua.kh.butov.ishop.service.NotificationService;
 import ua.kh.butov.ishop.service.OrderService;
 
@@ -51,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
 	private AvatarService avatarService;
 	@Autowired
 	private NotificationService notificationService;
+	@Autowired
+	private NotificationContentBuilderService notificationContentBuilderService;
 
 	@Override
 	@Transactional
@@ -111,7 +114,8 @@ public class OrderServiceImpl implements OrderService {
 		TransactionSynchronizationManager.addSynchronization(new TransactionSynchronization() {
 			@Override
 			public void afterCommit() {
-				notificationService.sendNewOrderCreatedNotification(currentAccount.getEmail(), order);
+				String content = notificationContentBuilderService.buildNewOrderCreatedNotificationMessage(order);
+				notificationService.sendNotificationMessage(currentAccount.getEmail(), content);
 			}
 		});
 		return order.getId();
